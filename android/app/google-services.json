@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "424623805367",
+    "project_id": "hyaupapp",
+    "storage_bucket": "hyaupapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424623805367:android:a73b2920b88c2ca0a4ce32",
+        "android_client_info": {
+          "package_name": "com.hyaup.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "424623805367-qdrhhi06mrcgd325mh8oqmu8qhgkjgll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANo3-m2agELX4r6gStN3OCi5mwDPlNdvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "424623805367-qdrhhi06mrcgd325mh8oqmu8qhgkjgll.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "424623805367-m3u1sv1n6nj4b6of65snhur5tg9dpbt1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.hyaupMobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
