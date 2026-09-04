@@ -1,46 +1,84 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hyaup/screens/wrapper.dart';
-
+import 'core/theme/app_theme.dart';
+import 'core/utils/app_preferences.dart';
 import 'firebase_options.dart';
+import 'presentation/screens/employer/employer_auth_screen.dart';
+import 'presentation/screens/employer/employer_dashboard_screen.dart';
+import 'presentation/screens/intro/intro_screen.dart';
+import 'presentation/screens/main_navigation_screen.dart';
+import 'repository/auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase initialization warning: $e");
+  }
 
-  runApp(const MyApp());
+  runApp(const HyaUpApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HyaUpApp extends StatelessWidget {
+  const HyaUpApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'HyaUp - AI Job Search',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.blue),
-      ),
-      home: const WrapperScreen(),
+      title: 'HyaUp - AI Job Search Cameroon',
+      theme: AppTheme.lightTheme,
+      home: const AppRootScreen(),
+    );
+  }
+}
+
+class AppRootScreen extends StatefulWidget {
+  const AppRootScreen({super.key});
+
+  @override
+  State<AppRootScreen> createState() => _AppRootScreenState();
+}
+
+class _AppRootScreenState extends State<AppRootScreen> {
+  final AuthRepository _authRepo = AuthRepository();
+
+  Future<Widget> _determineInitialRoute() async {
+    final bool hasSeenIntro = await AppPreferences.hasSeenIntro();
+    if (!hasSeenIntro) {
+      return const IntroScreen();
+    }
+
+    final String? role = await AppPreferences.getUserRole();
+    if (role == "employer") {
+      final bool isAuth = _authRepo.isAuthenticated;
+      if (isAuth) {
+        return const EmployerDashboardScreen();
+      } else {
+        return const EmployerAuthScreen(isSignUp: false);
+      }
+    }
+
+    // Default: Job Seeker / Professional -> Discover Job Search
+    return const MainNavigationScreen();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Widget>(
+      future: _determineInitialRoute(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return snapshot.data ?? const IntroScreen();
+      },
     );
   }
 }

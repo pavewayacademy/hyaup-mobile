@@ -1,37 +1,45 @@
 import 'package:dio/dio.dart';
-
+import '../core/constants/api_endpoints.dart';
 import 'auth.dart';
 
 class ApiClient {
-  final Dio dio = Dio();
+  static final ApiClient _instance = ApiClient._internal();
+  factory ApiClient() => _instance;
+
+  late final Dio dio;
   final AuthRepository _authRepository = AuthRepository();
 
-  ApiClient() {
-    dio.options.baseUrl = "http://0.0.0.0:8000";
+  ApiClient._internal() {
+    dio = Dio(
+      BaseOptions(
+        baseUrl: ApiEndpoints.defaultBaseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 15),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
-    // Wire up the interceptor workflow
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Fetch the valid toekn (return cache or generates new one)
           final String? token = await _authRepository.getIdToken();
-
-          // Attach token to request header
-          if (token != null) {
+          if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-
-          // Continue with the request
-          return handler.next(options); // Proceed with HTTP request execution
+          return handler.next(options);
         },
         onError: (DioException e, handler) {
-          if (e.response?.statusCode == 401) {
-            // Optional: Global trigger pointing users back to the login page
-            // if their backend session explicitly fails validation
-          }
+          // Log or handle unauthorized responses globally
           return handler.next(e);
         },
       ),
     );
+  }
+
+  void setBaseUrl(String url) {
+    dio.options.baseUrl = url;
   }
 }
