@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../data/repositories/user_repository.dart';
@@ -11,7 +13,8 @@ class EmployerOnboardingScreen extends StatefulWidget {
   const EmployerOnboardingScreen({super.key, this.initialCompanyName});
 
   @override
-  State<EmployerOnboardingScreen> createState() => _EmployerOnboardingScreenState();
+  State<EmployerOnboardingScreen> createState() =>
+      _EmployerOnboardingScreenState();
 }
 
 class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
@@ -43,13 +46,20 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
     "Bafoussam",
     "Buea",
     "Garoua",
+    "Bamenda",
+    "Maroua",
+    "Ngaoundéré",
+    "Kumba",
+    "Mbouda",
     "Remote in Cameroon",
   ];
 
   @override
   void initState() {
     super.initState();
-    _companyController = TextEditingController(text: widget.initialCompanyName ?? "");
+    _companyController = TextEditingController(
+      text: widget.initialCompanyName ?? "",
+    );
   }
 
   Future<void> _handleComplete() async {
@@ -63,41 +73,60 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
 
     setState(() => _isSubmitting = true);
 
-    final user = _authRepo.currentUser;
-    final uid = user?.uid ?? "employer-${DateTime.now().millisecondsSinceEpoch}";
-    final email = user?.email ?? "recruiter@hyaup.com";
+    try {
+      final user = _authRepo.currentUser;
+      final uid =
+          user?.uid ?? "employer-${DateTime.now().millisecondsSinceEpoch}";
+      final email = user?.email ?? "recruiter@hyaup.com";
 
-    await _userRepo.saveOnboardingProfile(
-      uid: uid,
-      email: email,
-      role: "employer",
-      onboardingData: {
-        'company_name': companyName,
-        'industry': _selectedIndustry,
-        'city': _selectedCity,
-        'company_size': _companySize,
-        'phone': _phoneController.text.trim(),
-        'website': _websiteController.text.trim(),
-        'bio': _bioController.text.trim(),
-      },
-    );
-
-    setState(() => _isSubmitting = false);
-
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const EmployerDashboardScreen()),
+      await _userRepo.saveOnboardingProfile(
+        uid: uid,
+        email: email,
+        role: "employer",
+        onboardingData: {
+          'is_onboarded': false,
+          'company_name': companyName,
+          'industry': _selectedIndustry,
+          'city': _selectedCity,
+          'company_size': _companySize,
+          'phone': _phoneController.text.trim(),
+          'website': _websiteController.text.trim(),
+          'bio': _bioController.text.trim(),
+        },
       );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const EmployerDashboardScreen(),
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      // Handle Dio Exceptions
+      print(e.response?.data);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.response?.data['detail']), backgroundColor: AppColors.rose),
+        );
+      }
+    } catch (e) {
+      // Handle Other Exceptions
+      print(e.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     }
+    setState(() => _isSubmitting = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Company Onboarding"),
-      ),
+      appBar: AppBar(title: const Text("Company Onboarding")),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -105,7 +134,10 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryContainer,
                   borderRadius: BorderRadius.circular(20),
@@ -121,7 +153,9 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
               const SizedBox(width: 8),
               Text(
                 "Company Profile Setup",
-                style: AppTypography.titleSmall.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.titleSmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -202,7 +236,8 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
             maxLines: 3,
             decoration: const InputDecoration(
               labelText: "Company Overview / Mission",
-              hintText: "Briefly introduce what your team builds and your work culture...",
+              hintText:
+                  "Briefly introduce what your team builds and your work culture...",
             ),
           ),
           const SizedBox(height: 32),
@@ -217,7 +252,10 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Text("Complete Setup & Open Employer Center"),
           ),

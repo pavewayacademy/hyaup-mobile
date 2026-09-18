@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../core/constants/api_endpoints.dart';
 import '../../core/utils/app_preferences.dart';
 import '../../repository/api_client.dart';
@@ -16,7 +18,7 @@ class UserRepository {
   Map<String, dynamic>? get currentProfile => _cachedProfile;
 
   /// Sync user account and onboarding details to FastAPI backend
-  Future<Map<String, dynamic>> saveOnboardingProfile({
+  Future<Map<String, dynamic>?> saveOnboardingProfile({
     required String uid,
     required String email,
     required String role, // 'employer' or 'professional'
@@ -30,24 +32,30 @@ class UserRepository {
     };
 
     try {
+      print(payload);
       final response = await _apiClient.dio.patch(
         "${ApiEndpoints.users}/$uid",
         data: payload,
       );
 
+      print(response.data);
+
       if (response.statusCode == 200 && response.data is Map) {
         _cachedProfile = Map<String, dynamic>.from(response.data);
+        _cachedProfile ??= payload;
+        await AppPreferences.setUserRole(role);
+        await AppPreferences.setOnboarded(true);
       }
-    } catch (_) {
+      return null;
+    } on DioException catch (e) {
+      print(e.response?.data);
+      rethrow;
+    } catch (e) {
+      print(e.toString());
       // Fallback to local profile cache
-      _cachedProfile = payload;
+      // _cachedProfile = payload;
+      rethrow;
     }
-
-    _cachedProfile ??= payload;
-    await AppPreferences.setUserRole(role);
-    await AppPreferences.setOnboarded(true);
-
-    return _cachedProfile!;
   }
 
   /// Pull user profile information from the backend

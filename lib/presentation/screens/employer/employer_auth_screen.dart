@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/app_preferences.dart';
@@ -35,6 +36,11 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final companyName = _companyController.text.trim();
+    debugPrint("---------------------------");
+    debugPrint(email);
+    debugPrint(password);
+    debugPrint(companyName);
+    debugPrint("---------------------------");
 
     if (email.isEmpty || password.isEmpty) {
       setState(() => _error = "Please enter both official email and password.");
@@ -66,19 +72,24 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => EmployerOnboardingScreen(initialCompanyName: companyName),
+              builder: (context) =>
+                  EmployerOnboardingScreen(initialCompanyName: companyName),
             ),
           );
         } else {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const EmployerDashboardScreen()),
+            MaterialPageRoute(
+              builder: (context) => const EmployerDashboardScreen(),
+            ),
           );
         }
       }
     } catch (e) {
       setState(() {
-        _error = e.toString().contains("]") ? e.toString().split("]").last.trim() : e.toString();
+        _error = e.toString().contains("]")
+            ? e.toString().split("]").last.trim()
+            : e.toString();
         _isLoading = false;
       });
     }
@@ -94,7 +105,9 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const EmployerOnboardingScreen(initialCompanyName: "HyaUp Enterprise"),
+          builder: (context) => const EmployerOnboardingScreen(
+            initialCompanyName: "HyaUp Enterprise",
+          ),
         ),
       );
     }
@@ -121,13 +134,19 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
                     color: AppColors.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.business_center_rounded, color: AppColors.primary, size: 34),
+                  child: const Icon(
+                    Icons.business_center_rounded,
+                    color: AppColors.primary,
+                    size: 34,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
 
               Text(
-                _isSignUp ? "Hire Top Talent in Cameroon" : "Welcome Back, Employer",
+                _isSignUp
+                    ? "Hire Top Talent in Cameroon"
+                    : "Welcome Back, Employer",
                 style: AppTypography.headlineMedium,
                 textAlign: TextAlign.center,
               ),
@@ -150,7 +169,9 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
                   ),
                   child: Text(
                     _error!,
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.rose),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.rose,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -199,9 +220,16 @@ class _EmployerAuthScreenState extends State<EmployerAuthScreen> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
                       )
-                    : Text(_isSignUp ? "Create Employer Account" : "Sign In to Employer Center"),
+                    : Text(
+                        _isSignUp
+                            ? "Create Employer Account"
+                            : "Sign In to Employer Center",
+                      ),
               ),
               const SizedBox(height: 14),
 

@@ -1,7 +1,7 @@
 class ApiEndpoints {
   // Configurable base URL (default local FastAPI server)
   // For Android Emulator use 10.0.2.2, for iOS/Desktop use localhost/127.0.0.1
-  static const String defaultBaseUrl = "http://10.0.2.2:8000";
+  static const String defaultBaseUrl = "http://192.168.0.183:8000";
 
   // Job Search & Management
   static const String jobsSearch = "/jobs/search";
