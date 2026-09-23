@@ -105,7 +105,6 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
       }
     } on DioException catch (e) {
       // Handle Dio Exceptions
-      print(e.response?.data);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.response?.data['detail']), backgroundColor: AppColors.rose),
@@ -113,7 +112,6 @@ class _EmployerOnboardingScreenState extends State<EmployerOnboardingScreen> {
       }
     } catch (e) {
       // Handle Other Exceptions
-      print(e.toString());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hyaup/presentation/screens/employer/employer_settings_screen.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/utils/app_preferences.dart';
@@ -80,6 +82,15 @@ class _EmployerDashboardScreenState extends State<EmployerDashboardScreen> with 
     }
   }
 
+    void _goToSettings() {
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const EmployerSettingsScreen()),
+      );
+    }
+  }
+
   void _signOut() async {
     await _authRepo.signOut();
     await AppPreferences.clearPreferences();
@@ -117,6 +128,8 @@ class _EmployerDashboardScreenState extends State<EmployerDashboardScreen> with 
                 _switchToJobSeeker();
               } else if (val == 'signout') {
                 _signOut();
+              } else {
+                _goToSettings();
               }
             },
             itemBuilder: (context) => [
@@ -127,6 +140,16 @@ class _EmployerDashboardScreenState extends State<EmployerDashboardScreen> with 
                     Icon(Icons.swap_horiz_rounded, size: 20),
                     SizedBox(width: 8),
                     Text("Switch to Job Seeker Mode"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings_rounded, size: 20),
+                    SizedBox(width: 8),
+                    Text("Settings"),
                   ],
                 ),
               ),

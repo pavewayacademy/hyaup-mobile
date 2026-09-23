@@ -62,12 +62,16 @@ class UserRepository {
   Future<Map<String, dynamic>?> fetchUserProfile(String uid) async {
     try {
       final response = await _apiClient.dio.get("${ApiEndpoints.users}/$uid");
+      print("response");
+      print(response.data);
       if (response.statusCode == 200 && response.data is Map) {
         _cachedProfile = Map<String, dynamic>.from(response.data);
         return _cachedProfile;
       }
-    } catch (_) {
+    } catch (e) {
       // Fallback
+      print(e.toString());
+      rethrow;
     }
 
     return _cachedProfile;
